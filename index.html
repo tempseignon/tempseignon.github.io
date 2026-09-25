@@ -1,0 +1,78 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NYC Campaign Finance Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="top-bar">
+  <span class="nyc-logo">NYC</span>
+  <span class="top-link">Official website ▾</span>
+  <span class="top-lang">🌐 English</span>
+</div>
+
+<nav class="main-nav">
+  <div class="nav-container">
+    <span class="nav-logo">📊 Campaign Finance Dashboard</span>
+    <ul class="nav-links">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#analysis">Financial Analysis</a></li>
+      <li><a href="#payments">Public Funds</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <h1>NYC Campaign Finance Dashboard</h1>
+  <div class="quick-tags">
+    <span class="tag">🏛️ Financial Analysis</span>
+    <span class="tag">💵 Public Funds Payments</span>
+    <span class="tag">🔴 Live Data</span>
+  </div>
+</header>
+
+<section id="overview" class="section">
+  <div class="section-container">
+    <h2 class="section-title">Overview</h2>
+    <p class="about-text">
+      This dashboard pulls live data from the NYC Campaign Finance Board's
+      <a href="https://data.cityofnewyork.us/City-Government/Campaign-Financial-Analysis/m3tj-a2pb" target="_blank" rel="noopener">Campaign Financial Analysis</a>
+      and Public Funds Payments datasets, showing borough-level totals for the five NYC boroughs.
+    </p>
+  </div>
+</section>
+
+<section id="analysis" class="section section-alt">
+  <div class="section-container">
+    <h2 class="section-title">Net Contributions by Borough — Financial Analysis</h2>
+    <div class="chart-wrap">
+      <canvas id="analysisChart"></canvas>
+    </div>
+    <p id="analysisLoading" class="loading-msg">Loading live data…</p>
+  </div>
+</section>
+
+<section id="payments" class="section">
+  <div class="section-container">
+    <h2 class="section-title">Total Public Funds Paid by Borough</h2>
+    <div class="chart-wrap">
+      <canvas id="paymentsChart"></canvas>
+    </div>
+    <p id="paymentsLoading" class="loading-msg">Loading live data…</p>
+  </div>
+</section>
+
+<footer>
+  <p>Data source: NYC Campaign Finance Board via NYC Open Data</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
