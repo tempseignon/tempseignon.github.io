@@ -91,4 +91,4 @@ function init() {
   drawChart(AGENCIES[START_AT]);
 }
 
-document.addEventListener("DOMContentLoaded", init
+document.addEventListener("DOMContentLoaded", init);
