@@ -4,7 +4,7 @@
 // label = what shows in the dropdown, keywords = text to look for in the agency name
 const AGENCIES = [
   { label: "Campaign Finance Board", keywords: ["CAMPAIGN FINANCE"] },
-  { label: "Borough President offices", keywords: ["BOROUGH PRESIDENT"] },
+  { label: "Borough President Offices", keywords: ["BOROUGH PRESIDENT"] },
   { label: "Comptroller", keywords: ["COMPTROLLER"] },
   { label: "Emergency Management", keywords: ["EMERGENCY MANAGEMENT"] },
   { label: "Social Services (HRA/DHS)", keywords: ["SOCIAL SERVICES"] },
