@@ -1,96 +1,35 @@
-// script.js
+const AGENCY = "DEPARTMENT OF BUILDINGS"; // change this for each agency
 
-// Financial Analysis dataset uses boro_dist like "(Bx)", "(M)", "(Bk)", "(Q)", "(SI)"
-const ANALYSIS_URL = "https://data.cityofnewyork.us/resource/m3tj-a2pb.json?$limit=5000";
-const ANALYSIS_BOROUGHS = {
-  "(Bx)": "Bronx",
-  "(M)": "Manhattan",
-  "(Bk)": "Brooklyn",
-  "(Q)": "Queens",
-  "(SI)": "Staten Island"
-};
-
-// Public Funds Payments dataset uses officeboro like "X", "M", "K", "Q", "S"
-const PAYMENTS_URL = "https://data.cityofnewyork.us/resource/u69g-mvrb.json?$limit=5000";
-const PAYMENTS_BOROUGHS = {
-  "X": "Bronx",
-  "M": "Manhattan",
-  "K": "Brooklyn",
-  "Q": "Queens",
-  "S": "Staten Island"
-};
-
-async function loadDataset(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("API request failed: " + res.status);
-  return res.json();
-}
-
-function sumByBorough(rows, boroughField, boroughMap, valueField) {
-  const totals = {};
-  Object.values(boroughMap).forEach(name => totals[name] = 0);
-
-  rows.forEach(row => {
-    const code = row[boroughField];
-    const name = boroughMap[code];
-    if (!name) return; // skip citywide/non-borough rows
-    const val = parseFloat(row[valueField]) || 0;
-    totals[name] += val;
-  });
-
-  return totals;
-}
-
-function renderChart(canvasId, totals, label) {
-  const labels = Object.keys(totals);
-  const values = Object.values(totals);
-
-  new Chart(document.getElementById(canvasId), {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [{
-        label: label,
-        data: values,
-        backgroundColor: "#4da6e0",
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: (v) => "$" + v.toLocaleString()
-          }
-        }
-      }
-    }
-  });
-}
+const params = new URLSearchParams({
+  "$select": "date_extract_y(end_date) as yr, short_title, count(*) as n",
+  "$where": `section_name='Changes in Personnel' AND agency_name='${AGENCY}' AND end_date>='2020-01-01T00:00:00' AND short_title in('APPOINTED','RESIGNED')`,
+  "$group": "yr, short_title",
+  "$order": "yr"
+});
+const URL_ = "https://data.cityofnewyork.us/resource/dg92-zbpx.json?" + params;
 
 async function init() {
-  try {
-    const analysisData = await loadDataset(ANALYSIS_URL);
-    const analysisTotals = sumByBorough(analysisData, "boro_dist", ANALYSIS_BOROUGHS, "net_cntns");
-    renderChart("analysisChart", analysisTotals, "Net Contributions ($)");
-    document.getElementById("analysisLoading").style.display = "none";
-  } catch (err) {
-    document.getElementById("analysisLoading").textContent = "Couldn't load Financial Analysis data right now.";
-    console.error(err);
-  }
+  const res = await fetch(URL_);
+  if (!res.ok) { console.error("API error", res.status); return; }
+  const rows = await res.json();
 
-  try {
-    const paymentsData = await loadDataset(PAYMENTS_URL);
-    const paymentsTotals = sumByBorough(paymentsData, "officeboro", PAYMENTS_BOROUGHS, "totalpay");
-    renderChart("paymentsChart", paymentsTotals, "Total Public Funds Paid ($)");
-    document.getElementById("paymentsLoading").style.display = "none";
-  } catch (err) {
-    document.getElementById("paymentsLoading").textContent = "Couldn't load Public Funds Payments data right now.";
-    console.error(err);
-  }
+  const years = [...new Set(rows.map(r => r.yr))].sort();
+  const countFor = (title) => years.map(y => {
+    const r = rows.find(r => r.yr === y && r.short_title === title);
+    return r ? Number(r.n) : 0;
+  });
+
+  new Chart(document.getElementById("analysisChart"), {
+    type: "bar",
+    data: {
+      labels: years,
+      datasets: [
+        { label: "Appointed", data: countFor("APPOINTED"), backgroundColor: "#4da6e0" },
+        { label: "Resigned", data: countFor("RESIGNED"), backgroundColor: "#e07a4d" }
+      ]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);
