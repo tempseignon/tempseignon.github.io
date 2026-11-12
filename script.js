@@ -18,6 +18,13 @@ const AGENCIES = [
   { label: "Business Integrity Commission", keywords: ["BUSINESS INTEGRITY"] },
   { label: "Records and Information Services", keywords: ["RECORDS"] }
 ];
+// Community boards (exact names so #1 doesn't also catch #10-12)
+for (let i = 1; i <= 12; i++) {
+  AGENCIES.push({ label: `Bronx Community Board ${i}`, exact: [`BRONX COMMUNITY BOARD #${i}`] });
+}
+for (let i = 1; i <= 3; i++) {
+  AGENCIES.push({ label: `Staten Island Community Board ${i}`, exact: [`STATEN ISLAND COMMUNITY BD #${i}`] });
+}
 const START_AT = 10; // which one shows first (10 = Department of Buildings)
 // ================================
 
@@ -30,9 +37,10 @@ async function drawChart(agency) {
   loading.textContent = "Loading live data…";
   document.getElementById("agencyName").textContent = agency.label.toUpperCase();
 
-  const match = agency.keywords
-    .map(k => `upper(agency_name) like '%${k}%'`)
-    .join(" OR ");
+  const parts = [];
+  (agency.keywords || []).forEach(k => parts.push(`upper(agency_name) like '%${k}%'`));
+  (agency.exact || []).forEach(n => parts.push(`upper(agency_name) = '${n}'`));
+  const match = parts.join(" OR ");
 
   const params = new URLSearchParams({
     "$select": "date_extract_y(end_date) as yr, short_title, count(*) as n",
